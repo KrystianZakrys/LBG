@@ -91,6 +91,13 @@ class Instances(object):
                 sum += 1
         return {'count':sum,'classes':classes}
 
+    def getNumberOfRowsForClass(self, classes):
+        for instance in self.instances:
+            temp = classes[instance.className]
+            temp += 1
+            classes[instance.className] = temp
+        return classes 
+
 def load_data(path):
     f = open(path,'r')
     f_content = f.readlines()
@@ -158,6 +165,14 @@ for instance in io.instances:
 
 normalizedData = normalizeMinMax(tempArgs)
 
+i = 0
+for args in normalizedData:
+    io.instances[i].args = args
+    i+=1
+
+for instance in io.instances:
+    print('Klasa ',instance.className,'\n', instance.args)
+    
 plt.rcParams['figure.figsize']=(16,9)
 plt.style.use('ggplot')
 
@@ -167,7 +182,7 @@ f2 = []
 
 for arg in normalizedData:
      f1.append(arg[0])
-     f2.append(arg[2])
+     f2.append(arg[1])
 
 X = np.array(list(zip(f1,f2)))
 
@@ -188,8 +203,8 @@ print(C)
 plt.scatter(f1,f2,c='black', s=7)
 
 colors = {0:'r',1:'g',2:'b',3:'y',4:'c',5:'m',6:'orange',7:'mediumspringgreen',8:'dodgerblue',9:'indigo',10:'blueviolet',11:'lime',12:'saddlebrown',13:'darkolivegreen',14:'khaki',15:'slategrey',16:'crimson'}
-i = 0
 
+i = 0
 for _class in classesDictionary['classes']:
     plt.scatter(C_x[i], C_y[i], marker='x', s=120,c=colors[i])
     i += 1
@@ -206,15 +221,38 @@ while error != 0:
     for i in range(k):
         points = [X[j] for j in range(len(X)) if clusters[j] == i]
         C[i] = np.mean(points, axis= 0)
+    print(C, 'printuje z whilea')
     error = dist(C, C_old, None)
 
 fig, ax = plt.subplots()
 i = 0
+classesPoints = {}
 for _class in classesDictionary['classes']:
     points = np.array([X[j] for j in range(len(X)) if clusters[j]==i])
+    classesPoints[_class] = points
     ax.scatter(points[:,0],points[:,1], s=7, c=colors[i])
     print('Printuje C:\n' ,C)
     ax.scatter(C[i,0],C[i,1], marker='x', s=120, c=colors[i])
     i += 1
 
+for _class in classesDictionary['classes']:
+    print('KLASA ', _class, '\n',classesPoints[_class])
+
+
+zgodne = 0
+niezgodne = 0
+#for instance in io.instances:
+#    for point in classesPoints[instance.className]:
+classDict = {}
+for _class in classesDictionary['classes']:
+    classDict[_class] = 0
+classInfo = io.getNumberOfRowsForClass(classDict)
+
+print('Klasyfikacja wczytana z pliku: ')
+for info in classInfo:
+    print(info, classInfo[info])
+        
+print('\nPo grupowaniu k-means:')
+for _class in classesDictionary['classes']:
+    print( _class,str(len(classesPoints[_class])))
 plt.show()

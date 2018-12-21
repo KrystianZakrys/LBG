@@ -167,14 +167,17 @@ f2 = []
 
 for arg in normalizedData:
      f1.append(arg[0])
-     f2.append(arg[1])
+     f2.append(arg[2])
 
 X = np.array(list(zip(f1,f2)))
 
 #Euclidean Distance Calculator
-def dist (a, b, ax=1):
-    return np.linalg.norm(a - b, axis = ax)
-
+def dist (a, b, ax=1, control='e'):
+    if control == 'e':
+        return np.linalg.norm(a - b, axis = ax)
+    if control == 'l1':
+        return  np.linalg.norm((a - b), ord=1)
+   
 maxX =np.max(X)
 C_x = np.random.uniform(0, np.max(X), size=k)
 C_y = np.random.uniform(0,np.max(X),size=k)
@@ -184,11 +187,11 @@ print(C)
 
 plt.scatter(f1,f2,c='black', s=7)
 
-colors = {0:'r',1:'g',2:'b'}
+colors = {0:'r',1:'g',2:'b',3:'y',4:'c',5:'m',6:'orange',7:'mediumspringgreen',8:'dodgerblue',9:'indigo',10:'blueviolet',11:'lime',12:'saddlebrown',13:'darkolivegreen',14:'khaki',15:'slategrey',16:'crimson'}
 i = 0
 
 for _class in classesDictionary['classes']:
-    plt.scatter(C_x[i], C_y[i], marker='.', s=200,c=colors[i])
+    plt.scatter(C_x[i], C_y[i], marker='x', s=120,c=colors[i])
     i += 1
 
 C_old = np.zeros(C.shape)
@@ -211,7 +214,7 @@ for _class in classesDictionary['classes']:
     points = np.array([X[j] for j in range(len(X)) if clusters[j]==i])
     ax.scatter(points[:,0],points[:,1], s=7, c=colors[i])
     print('Printuje C:\n' ,C)
-    ax.scatter(C[i,0],C[i,1], marker='.', s=200, c=colors[i])
+    ax.scatter(C[i,0],C[i,1], marker='x', s=120, c=colors[i])
     i += 1
 
 plt.show()
